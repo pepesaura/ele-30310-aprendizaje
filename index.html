@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Clases de conversación para inmigrantes, lunes y jueves de 10 a 11 en el Centro Social de Los Dolores (30310)" />
+    <link rel="canonical" href="https://ele.30310.es/" />
+
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+    <meta property="og:title" content="Conversación en español en Cartagena">
+    <meta property="og:description" content="Clases para inmigrantes, lunes y jueves de 10 a 11 en el Centro Social de Los Dolores (30310)">
+    <meta property="og:image" content="https://ele.30310.es/ELE30310.jpg" />
+    <meta property="og:image:width" content="800" />
+	<meta property="og:image:height" content="533" />
+	<meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Conversación en español en Cartagena">
+    <meta name="twitter:description" content="Clases para inmigrantes, lunes y jueves de 10 a 11 en el Centro Social de Los Dolores (30310)">
+    <meta name="twitter:image" content="https://ele.30310.es/ELE30310.jpg">
+
+    <meta property="og:url" content="https://ele.30310.es">
+    <meta property="og:type" content="website">
+
+    <link rel="manifest" href="/site.webmanifest">    
+
+    <title>Conversación en español en Cartagena</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #f5f5f5; /* Material Grey 100 */
+            color: #212121; /* Material Grey 900 */
+        }
+
+        /* Material Ripple & Transitions */
+        .mat-btn {
+            transition: background-color 0.3s, box-shadow 0.3s, transform 0.1s;
+        }
+        .mat-btn:active {
+            transform: scale(0.98);
+        }
+
+        /* Chart Container Styling per Requirements */
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 300px;
+            max-height: 400px;
+        }
+
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 350px;
+            }
+        }
+
+        .card-material {
+            background-color: white;
+            border-radius: 12px; /* Material Rounded corners */
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1); /* Elevation 2 */
+            transition: box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1), transform 0.2s;
+        }
+        
+        .card-material:hover {
+            box-shadow: 0 8px 16px rgba(0,0,0,0.15); /* Elevation 8 on hover */
+            transform: translateY(-2px);
+        }
+
+        /* Custom Scrollbar for a cleaner look */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1; 
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #bdbdbd; 
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #9e9e9e; 
+        }
+
+        /* Option Buttons styling */
+        .option-btn {
+            transition: all 0.2s ease-in-out;
+            border: 1px solid #e0e0e0;
+        }
+        .option-btn:hover {
+            background-color: #f5f5f5;
+            border-color: #bdbdbd;
+        }
+        .option-btn.correct {
+            background-color: #e8f5e9; /* Green 50 */
+            border-color: #4caf50; /* Green 500 */
+            color: #2e7d32;
+        }
+        .option-btn.incorrect {
+            background-color: #ffebee; /* Red 50 */
+            border-color: #ef5350; /* Red 400 */
+            color: #c62828;
+        }
+
+        /* Fade animation */
+        .fade-in {
+            animation: fadeIn 0.4s cubic-bezier(0.0, 0.0, 0.2, 1);
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+    <!-- Chosen Palette: Material Design Teal (Primary) & Grey (Surfaces). -->
+    <!-- Application Structure Plan: 
+         1. Dashboard (Inicio): Material layout with clear typography and prominent "FAB" style or contained buttons for actions.
+         2. Study Mode (Repaso): Uses "Chips" for filtering and Material Cards for questions.
+         3. Quiz Mode (Cuestionario): Linear progress indicator and card-based layout.
+         4. Results Analysis: Clean charts within cards.
+    -->
+    <!-- Visualization & Content Choices:
+         - Quiz Progress Bar: Styled as Material Linear Progress Indicator.
+         - Results Bar Chart: Chart.js with Material colors.
+         - Icons: Unicode characters.
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+</head>
+<body class="min-h-screen flex flex-col">
+
+    <!-- Material Top App Bar -->
+    <nav class="bg-teal-700 shadow-md sticky top-0 z-50 text-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center gap-3">
+                    <span class="text-2xl">🇪🇸</span>
+                    <h1 class="text-xl font-medium tracking-wide">Practica español</h1>
+                </div>
+                <!-- Desktop Nav -->
+                <div class="flex items-center space-x-2">
+                    <button onclick="app.navigate('dashboard')" class="mat-btn px-4 py-2 rounded-md text-sm font-medium text-teal-50 hover:bg-teal-600 transition">Inicio</button>
+                    <button onclick="app.navigate('study')" class="mat-btn px-4 py-2 rounded-md text-sm font-medium text-teal-50 hover:bg-teal-600 transition">Repasar</button>
+                    <button onclick="app.navigate('quiz')" class="mat-btn px-4 py-2 rounded-full text-sm font-bold text-teal-900 bg-white hover:bg-teal-50 shadow-sm transition">Test</button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content Area -->
+    <main id="app-content" class="flex-grow max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full flex flex-col">
+        <!-- Views will be injected here -->
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-white border-t border-gray-200 mt-auto">
+        <div class="max-w-7xl mx-auto py-6 px-4 overflow-hidden sm:px-6 lg:px-8">
+            <p class="text-center text-sm text-gray-500">
+                Basado en las clases de conversación y cultura de los lunes (y jueves) a las 10 en Cartagena
+            </p>
+        </div>
+    </footer>
+
+    <script>
+        // --- DATA STORE ---
+        const rawData = [
+            // I. Estereotipos
+            { id: 1, topic: "Estereotipos", type: "Cultura", question: "Cuando decimos que 'todos los alemanes son serios', estamos usando...", options: ["Una mentira piadosa.", "Un estereotipo.", "Una receta de cocina.", "Una noticia."], answer: 1 },
+            { id: 2, topic: "Estereotipos", type: "Cultura", question: "¿Crees que la comida define la cultura de un país?", options: ["No, la comida no es importante.", "Sí, es una parte fundamental de la identidad.", "Solo si es comida rápida.", "Depende del precio."], answer: 1 },
+            { id: 3, topic: "Estereotipos", type: "Vocabulario", question: "¿Qué significa 'ser la oveja negra' de la familia?", options: ["Ser la persona que viste siempre de negro.", "Ser el miembro diferente o rebelde de la familia.", "Ser la persona que tiene una granja.", "Ser el favorito de los abuelos."], answer: 1 },
+            { id: 4, topic: "Estereotipos", type: "Cultura", question: "Muchas personas piensan que en España todos duermen la siesta. Esto es...", options: ["Una verdad absoluta.", "Una generalización o estereotipo.", "Una ley del gobierno.", "Una prohibición."], answer: 1 },
+            
+            // II. Experiencias
+            { id: 5, topic: "Experiencias", type: "Gramática", question: "¿Cuál fue el último viaje que hiciste?", options: ["Mañana voy a ir a París.", "Fui a la playa el verano pasado.", "Quiero ir a la montaña.", "Estoy viajando ahora mismo."], answer: 1 },
+            { id: 6, topic: "Experiencias", type: "Vocabulario", question: "Un 'mochilero' es un viajero que...", options: ["Viaja con mucho lujo y maletas grandes.", "Viaja de forma económica y con una mochila.", "Solo viaja en primera clase.", "No le gusta salir de su casa."], answer: 1 },
+            { id: 7, topic: "Experiencias", type: "Comunicación", question: "¿Alguna vez has tenido una experiencia desagradable en un hotel?", options: ["Sí, una vez la habitación estaba muy sucia.", "No, nunca voy a hoteles.", "Sí, me encanta dormir en hoteles.", "No, el hotel era muy barato."], answer: 0 },
+            { id: 8, topic: "Experiencias", type: "Opinión", question: "¿Qué prefieres: planear todo el viaje o improvisar?", options: ["Prefiero improvisar y decidir en el momento.", "Odio viajar.", "Prefiero quedarme en el aeropuerto.", "No me gusta decidir nada."], answer: 0 },
+
+            // III. Trabajo
+            { id: 9, topic: "Trabajo", type: "Vocabulario", question: "Si trabajas más horas de las que dice tu contrato, estás haciendo...", options: ["Vacaciones.", "Horas extra.", "Una huelga.", "Una entrevista."], answer: 1 },
+            { id: 10, topic: "Trabajo", type: "Opinión", question: "¿Qué es más importante para ti en un trabajo?", options: ["Que esté cerca de mi casa.", "Que el jefe sea antipático.", "Ganar poco dinero.", "Trabajar los fines de semana siempre."], answer: 0 },
+            { id: 11, topic: "Trabajo", type: "Vocabulario", question: "Una persona que trabaja por su cuenta (no tiene jefe) es...", options: ["Un empleado.", "Un autónomo.", "Un desempleado.", "Un jubilado."], answer: 1 },
+            { id: 12, topic: "Trabajo", type: "Opinión", question: "¿Qué habilidad te parece más útil para encontrar trabajo hoy en día?", options: ["Saber cocinar muy bien.", "Hablar varios idiomas y saber informática.", "Ver muchas películas.", "Dormir muchas horas."], answer: 1 },
+            { id: 13, topic: "Trabajo", type: "Cultura", question: "En una entrevista de trabajo, es normal...", options: ["Llegar tarde.", "Hablar mal de tu anterior jefe.", "Preguntar sobre el salario y las condiciones.", "Ir en pijama."], answer: 2 },
+
+            // IV. Vida Sana
+            { id: 14, topic: "Vida Sana", type: "Salud", question: "Una dieta equilibrada consiste en...", options: ["Comer solo carne.", "Comer de todo con moderación (frutas, verduras, proteínas).", "No comer nada durante el día.", "Beber solo refrescos con azúcar."], answer: 1 },
+            { id: 15, topic: "Vida Sana", type: "Opinión", question: "¿Qué opinas sobre la frase 'Eres lo que comes'?", options: ["Que si como pollo, me convierto en pollo.", "Que nuestra salud depende mucho de nuestra alimentación.", "Que no importa lo que comemos.", "Que la comida es mágica."], answer: 1 },
+            { id: 16, topic: "Vida Sana", type: "Salud", question: "Para bajar de peso de forma saludable, deberías...", options: ["Dejar de comer.", "Hacer ejercicio y mejorar la dieta.", "Comer solo chocolate.", "Dormir todo el día."], answer: 1 },
+            { id: 17, topic: "Vida Sana", type: "Vocabulario", question: "¿Qué hábito consideras 'nocivo' (malo) para la salud?", options: ["Beber agua.", "Caminar todos los días.", "Fumar o beber mucho alcohol.", "Leer libros."], answer: 2 },
+
+            // V. Relaciones
+            { id: 18, topic: "Relaciones", type: "Opinión", question: "¿Qué cualidad valoras más en un amigo?", options: ["Que tenga mucho dinero.", "Que sea sincero y leal.", "Que viva lejos.", "Que hable poco."], answer: 1 },
+            { id: 19, topic: "Relaciones", type: "Comunicación", question: "Si tienes un problema con alguien, lo mejor es...", options: ["Gritar muy fuerte.", "Ignorar a la persona para siempre.", "Hablar y tratar de solucionarlo.", "Escribir un mensaje insultando."], answer: 2 },
+            { id: 20, topic: "Relaciones", type: "Vocabulario", question: "¿Te consideras una persona 'casera'?", options: ["Sí, me gusta mucho estar en casa.", "No, odio estar en casa, prefiero salir.", "Sí, porque tengo una casa.", "No, porque no tengo casa."], answer: 0 },
+            { id: 21, topic: "Relaciones", type: "Vocabulario", question: "¿Qué significa 'llevarse bien' con alguien?", options: ["Tener una buena relación.", "Llevar a alguien en el coche.", "Discutir mucho.", "No conocer a la persona."], answer: 0 },
+
+            // VI. Aprendizaje
+            { id: 22, topic: "Aprendizaje", type: "Gramática", question: "¿Qué te resulta más difícil del español ahora?", options: ["Decir 'hola'.", "Los verbos irregulares y el pasado.", "Los números del 1 al 10.", "Leer el menú del restaurante."], answer: 1 },
+            { id: 23, topic: "Aprendizaje", type: "Opinión", question: "¿Crees que es posible aprender un idioma sin estudiar gramática?", options: ["Sí, solo escuchando y hablando mucho, como los niños.", "No, es imposible hablar sin libros.", "Sí, pero solo si eres profesor.", "No, la gramática es lo único importante."], answer: 0 },
+            { id: 24, topic: "Aprendizaje", type: "Cultura", question: "Si pudieras vivir en un país hispanohablante un año, ¿qué harías?", options: ["Hablaría solo mi idioma con otros turistas.", "Intentaría conocer la cultura y hablar con la gente local.", "Me quedaría en el hotel viendo la tele.", "No saldría a la calle."], answer: 1 },
+
+            // VII. Opiniones
+            { id: 25, topic: "Opiniones", type: "Tecnología", question: "¿Crees que internet es útil para aprender?", options: ["No, internet solo sirve para jugar.", "Sí, hay muchos recursos, vídeos y diccionarios online.", "No, los libros son la única forma de aprender.", "Sí, pero es muy caro."], answer: 1 },
+            { id: 26, topic: "Opiniones", type: "Gramática", question: "¿Qué harías si ganaras la lotería?", options: ["Trabajaría más horas.", "Viajaría por todo el mundo y compraría una casa.", "Perdería el billete.", "No se lo diría a nadie y seguiría igual."], answer: 1 },
+            { id: 27, topic: "Opiniones", type: "Preferencias", question: "¿Prefieres vivir en la ciudad o en el campo?", options: ["En la ciudad, porque hay más servicios y actividades.", "En el campo, porque hay mucho ruido.", "En la ciudad, porque no hay gente.", "En el campo, porque me gustan los atascos de tráfico."], answer: 0 },
+
+            // VIII. Rutina
+            { id: 28, topic: "Rutina", type: "Gramática", question: "Mi rutina de fin de semana es ________ que mi rutina diaria.", options: ["Más estresante.", "Menos relajada.", "Más flexible y diferente.", "Igual de aburrida."], answer: 2 },
+            { id: 29, topic: "Rutina", type: "Gramática", question: "Ir al trabajo en coche es ________ que ir en bicicleta.", options: ["Más rápido pero menos ecológico.", "Más lento y más sano.", "Igual de barato.", "Menos cómodo."], answer: 0 },
+            { id: 30, topic: "Rutina", type: "Gramática", question: "Cocinar en casa suele ser ________ que comer en un restaurante.", options: ["Más caro.", "Más saludable y barato.", "Más rápido.", "Menos cansado."], answer: 1 }
+        ];
+
+        // State Management
+        const appState = {
+            currentView: 'dashboard',
+            quiz: {
+                currentQuestionIndex: 0,
+                score: 0,
+                answers: [] // Stores {questionId, correct: bool}
+            },
+            filter: 'Todos'
+        };
+
+        // --- CORE LOGIC ---
+
+        const app = {
+            init: () => {
+                app.navigate('dashboard');
+            },
+
+            navigate: (view) => {
+                appState.currentView = view;
+                const content = document.getElementById('app-content');
+                content.innerHTML = ''; // Clear content
+                
+                // Scroll to top
+                window.scrollTo(0, 0);
+
+                if (view === 'dashboard') app.renderDashboard(content);
+                if (view === 'study') app.renderStudy(content);
+                if (view === 'quiz') app.startQuiz(content);
+            },
+
+            // --- VIEW: DASHBOARD ---
+            renderDashboard: (container) => {
+                // Dashboard with Material Design Typography and Spacing
+                container.innerHTML = `
+                    <div class="fade-in space-y-12 h-full flex flex-col justify-center items-center py-12">
+                        <!-- Header Section -->
+                        <div class="text-center space-y-6 max-w-3xl">
+                            <h2 class="text-4xl md:text-5xl font-light text-gray-800 tracking-tight">
+                                Panel de Aprendizaje
+                            </h2>
+                            <p class="text-xl text-gray-600 font-light leading-relaxed">
+                                Bienvenido a tu espacio de práctica de conversación. Este cuestionario cubre <span class="font-medium text-teal-700">${rawData.length} preguntas</span> clave diseñadas para el nivel A2, abarcando estereotipos, trabajo y vida sana.
+                            </p>
+                        </div>
+
+                        <!-- CTA Section - Material Cards -->
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 w-full max-w-4xl mt-8">
+                            
+                            <!-- Study Card -->
+                            <div class="card-material p-8 flex flex-col items-center text-center cursor-pointer hover:bg-gray-50" onclick="app.navigate('study')">
+                                <div class="w-16 h-16 bg-teal-100 text-teal-700 rounded-full flex items-center justify-center text-3xl mb-6">
+                                    📖
+                                </div>
+                                <h3 class="text-2xl font-medium text-gray-800 mb-2">Practicar</h3>
+                                <p class="text-gray-500 mb-8 flex-grow">
+                                    Explora las preguntas sin presión. Filtra por temas y practica a tu ritmo.
+                                </p>
+                                <button class="mat-btn w-full py-3 px-6 rounded-md border border-teal-600 text-teal-700 font-medium hover:bg-teal-50 uppercase tracking-wide text-sm">
+                                    Ir a Repaso
+                                </button>
+                            </div>
+
+                            <!-- Quiz Card -->
+                            <div class="card-material p-8 flex flex-col items-center text-center cursor-pointer hover:bg-gray-50" onclick="app.navigate('quiz')">
+                                <div class="w-16 h-16 bg-teal-700 text-white rounded-full flex items-center justify-center text-3xl mb-6 shadow-lg">
+                                    📝
+                                </div>
+                                <h3 class="text-2xl font-medium text-gray-800 mb-2">Hacer el test</h3>
+                                <p class="text-gray-500 mb-8 flex-grow">
+                                    Ponte a prueba con las 30 preguntas y recibe una evaluación de tu nivel.
+                                </p>
+                                <button class="mat-btn w-full py-3 px-6 rounded-md bg-teal-600 text-white font-medium hover:bg-teal-700 shadow-md uppercase tracking-wide text-sm">
+                                    Comenzar Test
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            },
+
+            // --- VIEW: STUDY ---
+            renderStudy: (container) => {
+                const topics = ['Todos', ...new Set(rawData.map(q => q.topic))];
+                
+                // Filter logic
+                const filteredQuestions = appState.filter === 'Todos' 
+                    ? rawData 
+                    : rawData.filter(q => q.topic === appState.filter);
+
+                container.innerHTML = `
+                    <div class="fade-in">
+                        <div class="mb-8">
+                            <h2 class="text-3xl font-light text-gray-800 mb-4">Modo práctica</h2>
+                            <p class="text-gray-600 max-w-3xl text-lg">
+                                Selecciona un tema y haz clic en las tarjetas para ver una posible respuesta. Se trata de practicar el español.
+                            </p>
+                        </div>
+
+                        <!-- Material Chips (Filters) -->
+                        <div class="flex flex-wrap gap-3 mb-10">
+                            ${topics.map(t => `
+                                <button 
+                                    onclick="app.setFilter('${t}')"
+                                    class="mat-btn px-4 py-2 rounded-full text-sm font-medium transition-all border 
+                                    ${appState.filter === t 
+                                        ? 'bg-teal-100 text-teal-900 border-teal-200 shadow-sm' 
+                                        : 'bg-white text-gray-600 border-gray-300 hover:bg-gray-100'}"
+                                >
+                                    ${t}
+                                </button>
+                            `).join('')}
+                        </div>
+
+                        <!-- Cards Grid -->
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                            ${filteredQuestions.map(q => `
+                                <div onclick="this.classList.toggle('reveal')" class="group card-material p-6 cursor-pointer relative overflow-hidden h-64 flex flex-col justify-between select-none">
+                                    
+                                    <!-- Front -->
+                                    <div class="front transition-all duration-300 group-[.reveal]:opacity-10 group-[.reveal]:blur-sm h-full flex flex-col">
+                                        <div class="flex justify-between items-start mb-4">
+                                            <span class="inline-flex items-center px-2 py-1 rounded bg-gray-100 text-xs font-medium text-gray-600 uppercase tracking-wide">
+                                                ${q.topic}
+                                            </span>
+                                            <span class="text-xs text-gray-400">#${q.id}</span>
+                                        </div>
+                                        <h3 class="text-lg font-normal text-gray-800 mb-4 leading-relaxed flex-grow">
+                                            ${q.question}
+                                        </h3>
+                                        <div class="mt-auto text-center text-teal-600 text-sm font-medium opacity-0 group-hover:opacity-100 transition-opacity">
+                                            VER RESPUESTA
+                                        </div>
+                                    </div>
+
+                                    <!-- Back (Answer) - Hidden by default -->
+                                    <div class="absolute inset-0 flex items-center justify-center bg-teal-700 text-white p-6 opacity-0 group-[.reveal]:opacity-100 transition-opacity duration-300 text-center flex-col pointer-events-none">
+                                        <span class="text-teal-200 font-medium mb-3 text-sm uppercase tracking-widest">Respuesta Correcta</span>
+                                        <p class="text-xl font-medium leading-relaxed">${q.options[q.answer]}</p>
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+            },
+
+            setFilter: (topic) => {
+                appState.filter = topic;
+                app.renderStudy(document.getElementById('app-content'));
+            },
+
+            // --- VIEW: QUIZ ---
+            startQuiz: (container) => {
+                appState.quiz.score = 0;
+                appState.quiz.currentQuestionIndex = 0;
+                appState.quiz.answers = [];
+                app.renderQuestion(container);
+            },
+
+            renderQuestion: (container) => {
+                const qIndex = appState.quiz.currentQuestionIndex;
+                
+                // Check if quiz is finished
+                if (qIndex >= rawData.length) {
+                    app.renderQuizResults(container);
+                    return;
+                }
+
+                const q = rawData[qIndex];
+                const progress = ((qIndex) / rawData.length) * 100;
+
+                container.innerHTML = `
+                    <div class="max-w-3xl mx-auto fade-in mt-4">
+                        <!-- Material Linear Progress -->
+                        <div class="mb-8">
+                            <div class="flex justify-between text-xs font-medium text-gray-500 mb-2 uppercase tracking-wide">
+                                <span>Pregunta ${qIndex + 1} / ${rawData.length}</span>
+                                <span>${Math.round(progress)}%</span>
+                            </div>
+                            <div class="w-full bg-gray-200 rounded-full h-1.5 overflow-hidden">
+                                <div class="bg-teal-600 h-1.5 rounded-full transition-all duration-500 ease-out" style="width: ${progress}%"></div>
+                            </div>
+                        </div>
+
+                        <!-- Question Card -->
+                        <div class="card-material p-8 md:p-10">
+                            <span class="inline-block px-3 py-1 rounded text-xs font-bold tracking-widest uppercase bg-teal-50 text-teal-700 mb-6">
+                                ${q.topic}
+                            </span>
+                            
+                            <h3 class="text-2xl md:text-3xl font-normal text-gray-900 mb-10 leading-tight">
+                                ${q.question}
+                            </h3>
+
+                            <div class="space-y-4" id="options-container">
+                                ${q.options.map((opt, i) => `
+                                    <button onclick="app.handleAnswer(${i})" class="option-btn w-full text-left p-4 rounded-lg bg-white border border-gray-300 text-gray-700 font-normal text-lg flex items-center group relative overflow-hidden">
+                                        <span class="w-8 h-8 rounded-full bg-gray-100 text-gray-600 flex items-center justify-center mr-5 font-medium text-sm group-hover:bg-gray-200 transition-colors">
+                                            ${String.fromCharCode(65+i)}
+                                        </span>
+                                        ${opt}
+                                    </button>
+                                `).join('')}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            },
+
+            handleAnswer: (selectedIndex) => {
+                const qIndex = appState.quiz.currentQuestionIndex;
+                const q = rawData[qIndex];
+                const isCorrect = selectedIndex === q.answer;
+                
+                // Update State
+                appState.quiz.answers.push({
+                    questionId: q.id,
+                    topic: q.topic,
+                    correct: isCorrect
+                });
+                if (isCorrect) appState.quiz.score++;
+
+                // Visual Feedback
+                const buttons = document.querySelectorAll('.option-btn');
+                buttons.forEach((btn, idx) => {
+                    btn.disabled = true; // Disable further clicks
+                    if (idx === q.answer) {
+                        btn.classList.add('correct');
+                        btn.classList.remove('border-gray-300');
+                        btn.innerHTML += '<span class="ml-auto text-xl material-icons">✓</span>';
+                    } else if (idx === selectedIndex && !isCorrect) {
+                        btn.classList.add('incorrect');
+                        btn.classList.remove('border-gray-300');
+                        btn.innerHTML += '<span class="ml-auto text-xl material-icons">✕</span>';
+                    } else {
+                        btn.style.opacity = '0.5';
+                        btn.style.border = '1px solid transparent';
+                    }
+                });
+
+                // Next Question Delay
+                setTimeout(() => {
+                    appState.quiz.currentQuestionIndex++;
+                    app.renderQuestion(document.getElementById('app-content'));
+                }, 1200);
+            },
+
+            // --- VIEW: RESULTS ---
+            renderQuizResults: (container) => {
+                const score = appState.quiz.score;
+                const total = rawData.length;
+                const percentage = Math.round((score / total) * 100);
+                
+                // Calculate performance by topic
+                const topicPerf = {}; // { Topic: { correct: 0, total: 0 } }
+                appState.quiz.answers.forEach(ans => {
+                    if (!topicPerf[ans.topic]) topicPerf[ans.topic] = { correct: 0, total: 0 };
+                    topicPerf[ans.topic].total++;
+                    if (ans.correct) topicPerf[ans.topic].correct++;
+                });
+
+                const labels = Object.keys(topicPerf);
+                const data = labels.map(t => Math.round((topicPerf[t].correct / topicPerf[t].total) * 100));
+
+                let message = "";
+                let colorClass = "text-teal-700";
+                
+                if (percentage >= 90) { message = "¡Excelente Trabajo!"; }
+                else if (percentage >= 70) { message = "¡Muy Bien!"; }
+                else if (percentage >= 50) { message = "Buen esfuerzo, a repasar."; colorClass = "text-orange-600"; }
+                else { message = "Sigue practicando."; colorClass = "text-red-600"; }
+
+                container.innerHTML = `
+                    <div class="fade-in max-w-4xl mx-auto space-y-8 py-8">
+                        <div class="text-center space-y-4">
+                            <h2 class="text-4xl font-light text-gray-800">Resultados</h2>
+                            <div class="inline-flex items-center justify-center p-8 rounded-full bg-white shadow-lg border-4 ${percentage >= 50 ? 'border-teal-500' : 'border-orange-500'} w-40 h-40">
+                                <div class="text-center">
+                                    <span class="block text-5xl font-bold text-gray-800">${score}</span>
+                                    <span class="text-sm text-gray-500 font-medium uppercase tracking-wide">de ${total}</span>
+                                </div>
+                            </div>
+                            <p class="text-2xl font-normal ${colorClass}">${message}</p>
+                        </div>
+
+                        <!-- Performance Chart Card -->
+                        <div class="card-material p-8">
+                            <h3 class="text-lg font-medium text-gray-700 mb-6 pb-2 border-b border-gray-100">Rendimiento por Tema</h3>
+                            <div class="chart-container">
+                                <canvas id="resultsChart"></canvas>
+                            </div>
+                        </div>
+
+                        <!-- Actions -->
+                        <div class="flex flex-col sm:flex-row justify-center gap-4 pt-4">
+                            <button onclick="app.navigate('dashboard')" class="mat-btn px-8 py-3 rounded-md border border-gray-300 text-gray-700 hover:bg-gray-100 font-medium uppercase tracking-wide text-sm">
+                                Volver al Inicio
+                            </button>
+                            <button onclick="app.startQuiz(document.getElementById('app-content'))" class="mat-btn px-8 py-3 rounded-md bg-teal-600 text-white hover:bg-teal-700 shadow-md font-medium uppercase tracking-wide text-sm">
+                                Intentar de Nuevo
+                            </button>
+                        </div>
+                    </div>
+                `;
+
+                // Render Results Chart
+                new Chart(document.getElementById('resultsChart'), {
+                    type: 'bar',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: '% Aciertos',
+                            data: data,
+                            backgroundColor: data.map(val => val > 70 ? '#009688' : (val > 40 ? '#ffb74d' : '#e57373')),
+                            borderRadius: 4,
+                            barThickness: 40
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            y: { 
+                                beginAtZero: true, 
+                                max: 100,
+                                grid: { color: '#f5f5f5' }
+                            },
+                            x: {
+                                grid: { display: false }
+                            }
+                        },
+                        plugins: {
+                            legend: { display: false },
+                            tooltip: {
+                                backgroundColor: 'rgba(33, 33, 33, 0.9)',
+                                padding: 12,
+                                cornerRadius: 4
+                            }
+                        }
+                    }
+                });
+            }
+        };
+
+        // Initialize App
+        document.addEventListener('DOMContentLoaded', app.init);
+
+    </script>
+</body>
+</html>
